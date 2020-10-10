@@ -1,6 +1,7 @@
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from argparse import ArgumentParser
 from sklearn.preprocessing import StandardScaler
 from data import df_train_digits, df_test_digits, df_train_news, df_test_news
 
@@ -114,50 +115,61 @@ def plotLL(ll:np.ndarray, it:int, dataset:str, optim:str):
     plt.show()
 
 
-"""
-N output classes in datasets
-"""
-n_cls_digits = len(np.unique(df_train_digits['Var2'].values))
-n_cls_news = len(np.unique(df_train_news['Var2'].values))
+def main():
+    """
+    Loads data, normalizes data, inits weights, trains on dataset, and generates Log likelihood graphs
+    """
 
-"""
-N features to learn for each dataset
-"""
-n_feats_digits= df_train_digits.shape[1] - 1
-n_feats_news = df_train_news.shape[1] - 1
+    """
+    N output classes in datasets
+    """
+    n_cls_digits = len(np.unique(df_train_digits['Var2'].values))
+    n_cls_news = len(np.unique(df_train_news['Var2'].values))
 
-lr = .01
-iterations = 100
+    """
+    N features to learn for each dataset
+    """
+    n_feats_digits= df_train_digits.shape[1] - 1
+    n_feats_news = df_train_news.shape[1] - 1
 
-"""
-Weight matrices and biases for each dataset
-"""
-W_digits = np.random.rand(n_cls_digits, n_feats_digits)
-biases_digits = np.random.rand(n_cls_digits, 1)
+    lr = .01
+    iterations = 100
 
-W_news = np.random.rand(n_cls_news, n_feats_news)
-biases_news = np.random.rand(n_cls_news, 1)
+    """
+    Weight matrices and biases for each dataset
+    """
+    W_digits = np.random.rand(n_cls_digits, n_feats_digits)
+    biases_digits = np.random.rand(n_cls_digits, 1)
 
-"""
-Feature and label vectors
-"""
-X_digits = df_train_digits.loc[:, :'X_train_65'].to_numpy()
-y_digits = df_train_digits.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
+    W_news = np.random.rand(n_cls_news, n_feats_news)
+    biases_news = np.random.rand(n_cls_news, 1)
 
-X_news = df_train_news.loc[:, :'X_train_2001'].to_numpy()
-y_news = df_train_news.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
+    """
+    Feature and label vectors
+    """
+    X_digits = df_train_digits.loc[:, :'X_train_65'].to_numpy()
+    y_digits = df_train_digits.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
 
-"""
-Normalize datasets
-"""
-X_digits = X_digits / 255.
+    X_news = df_train_news.loc[:, :'X_train_2001'].to_numpy()
+    y_news = df_train_news.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
 
-scaler = StandardScaler()
-X_news = scaler.fit_transform(X_news)
+    """
+    Normalize datasets
+    """
+    X_digits = X_digits / 255.
 
-W_digits, biases_digits, LL_digits = gd(X_digits, y_digits, W_digits, biases_digits, lr, n_cls_digits, iterations)
-W_news, biases_news, LL_news = gd(X_news, y_news, W_news, biases_news, lr, n_cls_news, iterations)
+    scaler = StandardScaler()
+    X_news = scaler.fit_transform(X_news)
 
-# plot log likelihood
-plotLL(LL_digits, iterations, "digits", "GD")
-plotLL(LL_news, iterations, "news", "GD")
+    # train
+    W_digits, biases_digits, LL_digits = gd(X_digits, y_digits, W_digits, biases_digits, lr, n_cls_digits, iterations)
+    W_news, biases_news, LL_news = gd(X_news, y_news, W_news, biases_news, lr, n_cls_news, iterations)
+
+    # plot log likelihood
+    plotLL(LL_digits, iterations, "digits", "GD")
+    plotLL(LL_news, iterations, "news", "GD")
+
+if  __name__ == "__main__":
+    # parser = ArgumentParser()
+    # parser.add_argument("-lr", )
+    main()
