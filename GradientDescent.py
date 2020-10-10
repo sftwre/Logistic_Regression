@@ -26,7 +26,7 @@ def softmax(logits: np.ndarray, n_cls: int):
     return probs
 
 
-def linearPredict(X: np.ndarray, W: np.ndarray, biases: np.ndarray, n_cls: int):
+def linearPredict(X: np.ndarray, W: np.ndarray, biases: np.ndarray):
     """
     Compute logit scores for each output class over the training data.
 
@@ -35,7 +35,7 @@ def linearPredict(X: np.ndarray, W: np.ndarray, biases: np.ndarray, n_cls: int):
     biases: model biases
     n_cls: number of output classes
     """
-    logits = W.dot(X.T).T
+    logits = W.dot(X.T).T + biases.squeeze(1)
 
     return logits
 
@@ -77,7 +77,7 @@ def gd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
 
     for it in range(iterations):
 
-        logitScores = linearPredict(X, W, biases, n_cls)
+        logitScores = linearPredict(X, W, biases)
         probs = softmax(logitScores, n_cls)
 
         # error
@@ -102,7 +102,7 @@ def gd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
 n_cls = 10
 n_feats = df_train.shape[1] - 1
 lr = 0.01
-iterations = 1000
+iterations = 2000
 
 #  weight matrix
 W = np.random.rand(n_cls, n_feats)
