@@ -1,6 +1,7 @@
 import numpy as np
 import seaborn as sns
-from data import df_train
+from data import df_train_digits, df_test_digits, df_train_news, df_test_news
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
 sns.set_theme(style="darkgrid")
@@ -51,11 +52,7 @@ def cross_entropy(probs: np.ndarray, y: np.ndarray, W:np.ndarray) -> float:
 
     axis0 = np.arange(n)
 
-    pred_scores = probs[axis0, y.squeeze(-1)]
-
-    outerSum = np.log(pred_scores).sum()
-
-    CELoss = outerSum + L2
+    CELoss = np.log(probs[axis0, y.squeeze(-1)]).sum() + L2
 
     return CELoss / n
 
@@ -98,24 +95,50 @@ def gd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
 
     return W, biases, cost_history
 
-### train
-n_cls = 10
-n_feats = df_train.shape[1] - 1
-lr = 0.01
-iterations = 2000
+"""
+N output classes in datasets
+"""
+n_cls_digits = len(np.unique(df_train_digits['Var2'].values))
+n_cls_news = len(np.unique(df_train_news['Var2'].values))
 
-#  weight matrix
-W = np.random.rand(n_cls, n_feats)
-biases = np.random.rand(n_cls, 1)
+"""
+N features to learn for each dataset
+"""
+n_feats_digits= df_train_digits.shape[1] - 1
+n_feats_news = df_train_news.shape[1] - 1
 
-# feature and label vectors
-X = df_train.loc[:, :'X_train_65'].to_numpy()
-y = df_train.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
+lr = .0001
+iterations = 1000
 
-# normalize images
-X = X / 255.
+"""
+Weight matrices and biases for each dataset
+"""
+W_digits = np.random.rand(n_cls_digits, n_feats_digits)
+biases_digits = np.random.rand(n_cls_digits, 1)
 
-W, biases, costs = gd(X, y, W, biases, lr, n_cls, iterations)
+W_news = np.random.rand(n_cls_news, n_feats_news)
+biases_news = np.random.rand(n_cls_news, 1)
+
+"""
+Feature and label vectors
+"""
+X_digits = df_train_digits.loc[:, :'X_train_65'].to_numpy()
+y_digits = df_train_digits.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
+
+X_news = df_train_news.loc[:, :'X_train_2001'].to_numpy()
+y_news = df_train_news.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
+
+"""
+Normalize datasets
+"""
+X_digits = X_digits / 255.
+
+scaler = StandardScaler()
+X_news = scaler.fit_transform(X_news)
+
+# W_digits, biases_digits, costs = gd(X_digits, y_digits, W_digits, biases_digits, lr, n_cls_digits, iterations)
+
+W_news, biases_news, costs = gd(X_news, y_news, W_news, biases_news, lr, n_cls_news, iterations)
 
 # plot log likelihood as a function of the number of iterations
 x = np.arange(iterations)
