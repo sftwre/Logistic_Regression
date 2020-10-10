@@ -1,8 +1,9 @@
 import numpy as np
 import seaborn as sns
-from data import df_train_digits, df_test_digits, df_train_news, df_test_news
-from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from data import df_train_digits, df_test_digits, df_train_news, df_test_news
+
 
 sns.set_theme(style="darkgrid")
 
@@ -95,6 +96,24 @@ def gd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
 
     return W, biases, cost_history
 
+def plotLL(ll:np.ndarray, it:int, dataset:str, optim:str):
+    """
+    Used to plot the Log likelihood curve for set iterations.
+    :param ll: numpy array of Log likelihood's over training iterations
+    :param it: Number of iterations
+    :param dataset: Name of dataset
+    :param optim: Optimization algorithm used
+    :return:
+    """
+    x = np.arange(it)
+    ax = sns.lineplot(x=x, y=ll)
+
+    ax.set_title(f"Log-likelihood {dataset}, {optim}")
+    ax.set_xlabel("Iterations")
+    ax.set_ylabel("Log likelihood")
+    plt.show()
+
+
 """
 N output classes in datasets
 """
@@ -107,8 +126,8 @@ N features to learn for each dataset
 n_feats_digits= df_train_digits.shape[1] - 1
 n_feats_news = df_train_news.shape[1] - 1
 
-lr = .0001
-iterations = 1000
+lr = .01
+iterations = 100
 
 """
 Weight matrices and biases for each dataset
@@ -136,16 +155,9 @@ X_digits = X_digits / 255.
 scaler = StandardScaler()
 X_news = scaler.fit_transform(X_news)
 
-# W_digits, biases_digits, costs = gd(X_digits, y_digits, W_digits, biases_digits, lr, n_cls_digits, iterations)
+W_digits, biases_digits, LL_digits = gd(X_digits, y_digits, W_digits, biases_digits, lr, n_cls_digits, iterations)
+W_news, biases_news, LL_news = gd(X_news, y_news, W_news, biases_news, lr, n_cls_news, iterations)
 
-W_news, biases_news, costs = gd(X_news, y_news, W_news, biases_news, lr, n_cls_news, iterations)
-
-# plot log likelihood as a function of the number of iterations
-x = np.arange(iterations)
-
-ax = sns.lineplot(x=x, y=costs)
-
-ax.set_title("Log likelihood GD")
-ax.set_xlabel("Iterations")
-ax.set_ylabel("Log likelihood")
-plt.show()
+# plot log likelihood
+plotLL(LL_digits, iterations, "digits", "GD")
+plotLL(LL_news, iterations, "news", "GD")
