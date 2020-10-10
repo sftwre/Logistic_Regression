@@ -16,7 +16,7 @@ def softmax(logits: np.ndarray, n_cls: int):
 
     probs = np.array([np.empty([n_cls]) for i in range(logits.shape[0])])
 
-    for i in range(logits.shape[0]):
+    for i in range(len(logits)):
         exp = np.exp(logits[i])
         denom = np.sum(exp)
 
@@ -47,11 +47,15 @@ def cross_entropy(probs: np.ndarray, y: np.ndarray, W:np.ndarray) -> float:
     """
     n = probs.shape[0]
 
-    # L1 = W ** 2 / n
+    L2 = np.sum(W ** 2 / (2*n))
 
     axis0 = np.arange(n)
 
-    CELoss = -np.log(probs[axis0, y.squeeze(-1)]).sum()
+    pred_scores = probs[axis0, y.squeeze(-1)]
+
+    outerSum = np.log(pred_scores).sum()
+
+    CELoss = outerSum + L2
 
     return CELoss / n
 
@@ -65,7 +69,7 @@ def gd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
 
     n = len(y)
 
-    # L1 = 2 / n * W
+    L2 = np.sum(1 / n * W)
 
     axis0 = np.arange(X.shape[0])
 
@@ -83,7 +87,7 @@ def gd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
         probs[axis0, y.squeeze(-1)] -= 1
 
         # gradient of weights and biases
-        gradsW = probs.T.dot(X)
+        gradsW = probs.T.dot(X) + L2
         gradsBiases = np.sum(probs, axis=0).reshape(-1, 1)
 
         # update weights
