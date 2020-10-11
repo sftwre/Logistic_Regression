@@ -51,7 +51,7 @@ def sgd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
             # update biases
             biases -= (lr * gradsBiases)
 
-        cost_history[it] = cost
+        cost_history[it] = cost / n
 
     return W, biases, cost_history
 
