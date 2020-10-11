@@ -40,7 +40,7 @@ def sgd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
             probs[0, label] -= 1
 
             # gradient of weights
-            gradsW = probs.T.dot(data) + L2
+            gradsW = probs.T.dot(data)
 
             # gradient of biases
             gradsBiases = np.sum(probs, axis=0).reshape(-1, 1)
@@ -86,7 +86,9 @@ biases_digits = np.random.rand(n_cls_digits, 1)
 Feature and label vectors
 """
 X_digits = df_train_digits.loc[:, :'X_train_65'].to_numpy()
+X_digits_test = df_test_digits.loc[:, :'X_test_65'].to_numpy()
 y_digits = df_train_digits.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
+y_digits_test = df_test_digits.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
 
 # X_news = df_train_news.loc[:, :'X_train_2001'].to_numpy()
 # y_news = df_train_news.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
@@ -106,3 +108,24 @@ W_digits, biases_digits, LL_digits = sgd(X_digits, y_digits, W_digits, biases_di
 # plot log likelihood
 plotLL(LL_digits, iterations, "digits", "SGD")
 # plotLL(LL_news, iterations, "news", "GD")
+
+"""
+Test model
+"""
+
+def predict(X_test, W, y, biases, n_cls):
+
+    logitScores = linearPredict(X_test, W, biases)
+    probs = softmax(logitScores, n_cls)
+
+    # predicted labels
+    y_hat = np.argmax(probs, axis=1).reshape(-1, 1)
+
+    # compute accuracy
+    acc = (y_hat == y).sum() / len(y) * 100
+
+    return acc
+
+acc = predict(X_digits_test, W_digits, y_digits_test,biases_digits, n_cls_digits)
+
+print(f"Digits accuracy: {acc:.2f}%")
