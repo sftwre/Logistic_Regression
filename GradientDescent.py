@@ -97,7 +97,7 @@ def gd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
 
     return W, biases, cost_history
 
-def plotLL(ll:np.ndarray, it:int, dataset:str, optim:str):
+def plotLL(ll:np.ndarray, it:int, dataset:str, optim:str, lr:float):
     """
     Used to plot the Log likelihood curve for set iterations.
     :param ll: numpy array of Log likelihood's over training iterations
@@ -112,6 +112,7 @@ def plotLL(ll:np.ndarray, it:int, dataset:str, optim:str):
     ax.set_title(f"Log-likelihood {dataset}, {optim}")
     ax.set_xlabel("Iterations")
     ax.set_ylabel("Log likelihood")
+    plt.savefig(f"./ll_{dataset}_{optim}_lr{lr}_i{it}")
     plt.show()
 
 
@@ -148,7 +149,9 @@ def main():
     Feature and label vectors
     """
     X_digits = df_train_digits.loc[:, :'X_train_65'].to_numpy()
+    X_digits_test = df_test_digits.loc[:, :'X_test_65'].to_numpy()
     y_digits = df_train_digits.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
+    y_digits_test = df_test_digits.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
 
     X_news = df_train_news.loc[:, :'X_train_2001'].to_numpy()
     y_news = df_train_news.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
@@ -157,6 +160,7 @@ def main():
     Normalize datasets
     """
     X_digits = X_digits / 255.
+    X_digits_test = X_digits_test / 255.
 
     scaler = StandardScaler()
     X_news = scaler.fit_transform(X_news)
@@ -168,6 +172,21 @@ def main():
     # plot log likelihood
     plotLL(LL_digits, iterations, "digits", "GD")
     plotLL(LL_news, iterations, "news", "GD")
+    def predict(X_test, W, y, biases, n_cls):
+        logitScores = linearPredict(X_test, W, biases)
+        probs = softmax(logitScores, n_cls)
+
+        # predicted labels
+        y_hat = np.argmax(probs, axis=1).reshape(-1, 1)
+
+        # compute accuracy
+        acc = (y_hat == y).sum() / len(y) * 100
+
+        return acc
+
+    acc = predict(X_digits_test, W_digits, y_digits_test, biases_digits, n_cls_digits)
+
+    print(f"Digits accuracy: {acc:.2f}%")
 
 if  __name__ == "__main__":
     # parser = ArgumentParser()
