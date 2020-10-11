@@ -53,6 +53,9 @@ def sgd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
 
         cost_history[it] = cost / n
 
+        if it > 0 and (cost_history[it-1] > cost_history[it]):
+            lr /= 2
+
     return W, biases, cost_history
 
 """
