@@ -36,10 +36,13 @@ def sgd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
 
             cost += cross_entropy(probs, label, W)
 
-            z = probs[0, label] - 1
+            # compute error for ground truth label
+            probs[0, label] -= 1
 
             # gradient of weights
-            gradsW = z.dot(data) + L2
+            gradsW = probs.T.dot(data) + L2
+
+            # gradient of biases
             gradsBiases = np.sum(probs, axis=0).reshape(-1, 1)
 
             # update weights

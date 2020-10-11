@@ -33,9 +33,9 @@ def linearPredict(X: np.ndarray, W: np.ndarray, biases: np.ndarray):
     """
     Compute logit scores for each output class over the training data.
 
-    X: Training data
-    w: weight matrix
-    biases: model biases
+    X: Training data, n_samples x n_feats
+    w: weight matrix, n_cls x n_feats
+    biases: model biases, n_cls x 1
     n_cls: number of output classes
     """
     logits = W.dot(X.T).T + biases.squeeze(1)
