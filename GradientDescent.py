@@ -11,7 +11,7 @@ def gd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
 
     n = len(y)
 
-    L2 = np.sum(1 / n * W)
+    L2grad = 2 * W / n
 
     axis0 = np.arange(X.shape[0])
 
@@ -29,7 +29,7 @@ def gd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
         probs[axis0, y.squeeze(-1)] -= 1
 
         # gradient of weights and biases
-        gradsW = probs.T.dot(X) + L2
+        gradsW = probs.T.dot(X) + L2grad
         gradsBiases = np.sum(probs, axis=0).reshape(-1, 1)
 
         # update weights
