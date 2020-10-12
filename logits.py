@@ -68,6 +68,7 @@ def plotLL(ll:np.ndarray, it:int, dataset:str, optim:str, lr:float, acc:float):
     x = np.arange(it)
     ax = sns.lineplot(x=x, y=ll)
 
+    optim = optim.upper()
     ax.set_title(f"Log-likelihood {dataset}, {optim}, {acc:.2f}% accuracy")
     ax.set_xlabel("Iterations")
     ax.set_ylabel("Log likelihood")
