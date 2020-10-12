@@ -111,7 +111,7 @@ def plotLL(ll:np.ndarray, it:int, dataset:str, optim:str, lr:float):
     ax.set_title(f"Log-likelihood {dataset}, {optim}")
     ax.set_xlabel("Iterations")
     ax.set_ylabel("Log likelihood")
-    plt.savefig(f"./ll_{dataset}_{optim}_lr{lr}_i{it}")
+    plt.savefig(f"./plots/LL_{dataset}_{optim}_lr{lr}_i{it}.png")
     plt.show()
 
 
