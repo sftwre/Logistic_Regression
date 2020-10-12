@@ -138,31 +138,60 @@ def predict(X:np.ndarray, y:np.ndarray, W:np.ndarray, biases:np.ndarray, n_cls:i
 
 
 
+def main(args):
 
-    # train
-    W_digits, biases_digits, LL_digits = gd(X_digits, y_digits, W_digits, biases_digits, lr, n_cls_digits, iterations)
-    W_news, biases_news, LL_news = gd(X_news, y_news, W_news, biases_news, lr, n_cls_news, iterations)
+    datasets = ["news", "digits"]
 
-    # plot log likelihood
-    plotLL(LL_digits, iterations, "digits", "GD")
-    plotLL(LL_news, iterations, "news", "GD")
-    def predict(X_test, W, y, biases, n_cls):
-        logitScores = linearPredict(X_test, W, biases)
-        probs = softmax(logitScores, n_cls)
+    lr = args.lr
+    iterations = args.iterations
+    dataset = args.data
 
-        # predicted labels
-        y_hat = np.argmax(probs, axis=1).reshape(-1, 1)
+    if dataset not in datasets:
+        print(f"ERROR: -d must be within {datasets}")
+        exit(-1)
 
-        # compute accuracy
-        acc = (y_hat == y).sum() / len(y) * 100
+    # load news dataset and run gd
+    if dataset == datasets[0]:
+        n_cls_news = len(np.unique(y_news))
+        n_feats_news = X_news.shape[1]
 
-        return acc
+        W_news = np.random.rand(n_cls_news, n_feats_news)
+        biases_news = np.random.rand(n_cls_news, 1)
 
-    acc = predict(X_digits_test, W_digits, y_digits_test, biases_digits, n_cls_digits)
+        W_news, biases_news, LL_news = gd(X_news, y_news, W_news, biases_news, lr, n_cls_news, iterations)
 
-    print(f"Digits accuracy: {acc:.2f}%")
+        # predict test accuracy
+        acc = predict(X_news_test, y_news_test, W_news, biases_news, n_cls_news)
+        print(f"News accuracy: {acc:.2f}%")
+
+        # plot log likelihood
+        plotLL(LL_news, iterations, "news", "GD", lr, acc)
+
+
+    else:
+        n_cls_digits = len(np.unique(y_digits))
+        n_feats_digits = X_digits.shape[1]
+
+        W_digits = np.random.rand(n_cls_digits, n_feats_digits)
+        biases_digits = np.random.rand(n_cls_digits, 1)
+
+        # train
+        W_digits, biases_digits, LL_digits = gd(X_digits, y_digits, W_digits, biases_digits, lr, n_cls_digits, iterations)
+
+        # predict test accuracy
+        acc = predict(X_digits_test, y_digits_test, W_digits, biases_digits, n_cls_digits)
+        print(f"Digits accuracy: {acc:.2f}%")
+
+        # plot log likelihood
+        plotLL(LL_digits, iterations, "digits", "GD", lr, acc)
+
 
 if  __name__ == "__main__":
-    # parser = ArgumentParser()
-    # parser.add_argument("-lr", )
-    main()
+    parser = ArgumentParser()
+    parser.add_argument("-lr", type=float, default=.01, help="Learning rate")
+    parser.add_argument("-it", "--iterations", default=100, type=int, help="Number of iterations to train on")
+    parser.add_argument("-d", "--data", type=str, required=True, help="Dataset to train on (digits, news)")
+    parser.add_argument("-o", "--optim", type=str, help="Optimization algorithm to utilize")
+    args = parser.parse_args()
+
+    main(args)
