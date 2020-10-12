@@ -1,11 +1,6 @@
 import numpy as np
-import seaborn as sns
-from GradientDescent import plotLL
-from sklearn.preprocessing import StandardScaler
-from GradientDescent import linearPredict, softmax, cross_entropy
+from logits import linearPredict, softmax, cross_entropy, predict, plotLL
 from data import df_train_digits, df_test_digits, df_train_news, df_test_news
-
-sns.set_theme(style="darkgrid")
 
 
 def sgd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
@@ -106,26 +101,3 @@ W_digits, biases_digits, LL_digits = sgd(X_digits, y_digits, W_digits, biases_di
 # W_news, biases_news, LL_news = sgd(X_news, y_news, W_news, biases_news, lr, n_cls_news, iterations)
 
 # plot log likelihood
-plotLL(LL_digits, iterations, "digits", "SGD")
-# plotLL(LL_news, iterations, "news", "GD")
-
-"""
-Test model
-"""
-
-def predict(X_test, W, y, biases, n_cls):
-
-    logitScores = linearPredict(X_test, W, biases)
-    probs = softmax(logitScores, n_cls)
-
-    # predicted labels
-    y_hat = np.argmax(probs, axis=1).reshape(-1, 1)
-
-    # compute accuracy
-    acc = (y_hat == y).sum() / len(y) * 100
-
-    return acc
-
-acc = predict(X_digits_test, W_digits, y_digits_test,biases_digits, n_cls_digits)
-
-print(f"Digits accuracy: {acc:.2f}%")
