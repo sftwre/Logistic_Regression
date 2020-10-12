@@ -96,53 +96,47 @@ def gd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
 
     return W, biases, cost_history
 
-def plotLL(ll:np.ndarray, it:int, dataset:str, optim:str, lr:float):
+def plotLL(ll:np.ndarray, it:int, dataset:str, optim:str, lr:float, acc:float):
     """
     Used to plot the Log likelihood curve for set iterations.
     :param ll: numpy array of Log likelihood's over training iterations
     :param it: Number of iterations
     :param dataset: Name of dataset
     :param optim: Optimization algorithm used
+    :param lr: learning rate
+    :param acc: Test accuracy
     :return:
     """
     x = np.arange(it)
     ax = sns.lineplot(x=x, y=ll)
 
-    ax.set_title(f"Log-likelihood {dataset}, {optim}")
+    ax.set_title(f"Log-likelihood {dataset}, {optim}, {acc:.2f}% accuracy")
     ax.set_xlabel("Iterations")
     ax.set_ylabel("Log likelihood")
     plt.savefig(f"./plots/LL_{dataset}_{optim}_lr{lr}_i{it}.png")
     plt.show()
 
+def predict(X:np.ndarray, y:np.ndarray, W:np.ndarray, biases:np.ndarray, n_cls:int):
+    """
+    Computes accuracy or test error on test set.
+    :param X: Input data
+    :param y: ground truth labels
+    :param W: Learned weights
+    :param biases:
+    :param n_cls: number of output classes
+    """
+    logitScores = linearPredict(X, W, biases)
+    probs = softmax(logitScores, n_cls)
 
-def main():
-    """
-    Loads data, normalizes data, inits weights, trains on dataset, and generates Log likelihood graphs
-    """
+    # predicted labels
+    y_hat = np.argmax(probs, axis=1).reshape(-1, 1)
 
-    """
-    N output classes in datasets
-    """
-    n_cls_digits = len(np.unique(y_digits))
-    n_cls_news = len(np.unique(y_news))
+    # compute accuracy
+    acc = (y_hat == y).sum() / len(y) * 100
 
-    """
-    N features to learn for each dataset
-    """
-    n_feats_digits = X_digits.shape[1]
-    n_feats_news = X_news.shape[1]
+    return acc
 
-    lr = .01
-    iterations = 100
 
-    """
-    Weight matrices and biases for each dataset
-    """
-    W_digits = np.random.rand(n_cls_digits, n_feats_digits)
-    biases_digits = np.random.rand(n_cls_digits, 1)
-
-    W_news = np.random.rand(n_cls_news, n_feats_news)
-    biases_news = np.random.rand(n_cls_news, 1)
 
 
     # train
