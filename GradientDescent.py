@@ -2,8 +2,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
-from sklearn.preprocessing import StandardScaler
-from data import df_train_digits, df_test_digits, df_train_news, df_test_news
+from data import X_digits, X_digits_test, X_news, X_news_test, y_digits, y_digits_test, y_news, y_news_test
 
 
 sns.set_theme(style="darkgrid")
@@ -124,14 +123,14 @@ def main():
     """
     N output classes in datasets
     """
-    n_cls_digits = len(np.unique(df_train_digits['Var2'].values))
-    n_cls_news = len(np.unique(df_train_news['Var2'].values))
+    n_cls_digits = len(np.unique(y_digits))
+    n_cls_news = len(np.unique(y_news))
 
     """
     N features to learn for each dataset
     """
-    n_feats_digits= df_train_digits.shape[1] - 1
-    n_feats_news = df_train_news.shape[1] - 1
+    n_feats_digits = X_digits.shape[1]
+    n_feats_news = X_news.shape[1]
 
     lr = .01
     iterations = 100
@@ -145,25 +144,6 @@ def main():
     W_news = np.random.rand(n_cls_news, n_feats_news)
     biases_news = np.random.rand(n_cls_news, 1)
 
-    """
-    Feature and label vectors
-    """
-    X_digits = df_train_digits.loc[:, :'X_train_65'].to_numpy()
-    X_digits_test = df_test_digits.loc[:, :'X_test_65'].to_numpy()
-    y_digits = df_train_digits.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
-    y_digits_test = df_test_digits.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
-
-    X_news = df_train_news.loc[:, :'X_train_2001'].to_numpy()
-    y_news = df_train_news.loc[:, 'Var2'].to_numpy().reshape(-1, 1)
-
-    """
-    Normalize datasets
-    """
-    X_digits = X_digits / 255.
-    X_digits_test = X_digits_test / 255.
-
-    scaler = StandardScaler()
-    X_news = scaler.fit_transform(X_news)
 
     # train
     W_digits, biases_digits, LL_digits = gd(X_digits, y_digits, W_digits, biases_digits, lr, n_cls_digits, iterations)
