@@ -46,7 +46,9 @@ def cross_entropy(probs: np.ndarray, y: np.ndarray, W:np.ndarray) -> float:
     """
     n = probs.shape[0]
 
-    L2 = np.sum(W ** 2 / (2*n))
+    lam = 1/n
+
+    L2 = np.sum(lam * W.T.dot(W))
 
     axis0 = np.arange(n)
 
