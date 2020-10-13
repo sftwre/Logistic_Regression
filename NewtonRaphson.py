@@ -12,7 +12,7 @@ def nr(X: np.ndarray, y: np.ndarray, W: np.ndarray,
     lam = 1/n
     n_feats = W.shape[1]
 
-    L2 = lam * (W.T.dot(W))
+    L2grad = 2 * W / n
 
     reg = lam * np.eye(n_feats)
 
@@ -42,7 +42,7 @@ def nr(X: np.ndarray, y: np.ndarray, W: np.ndarray,
         firstD = probs.T.dot(X).T
 
         # gradient of weights and biases
-        gradsW = np.linalg.inv(hessian).dot(firstD).T
+        gradsW = np.linalg.inv(hessian).dot(firstD).T + L2grad
 
         gradsBiases = np.sum(probs, axis=0).reshape(-1, 1)
 

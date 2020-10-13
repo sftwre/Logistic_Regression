@@ -9,7 +9,7 @@ def sgd(X: np.ndarray, y: np.ndarray, W: np.ndarray,
     """
     n = len(y)
 
-    L2 = np.sum(1 / n * W)
+    L2grad = 2 * W / n
 
     cost_history = np.zeros(iterations)
 
