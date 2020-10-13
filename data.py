@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 
 data_file = './logistic_regression/'
 
@@ -56,6 +56,6 @@ Normalize datasets
 X_digits = X_digits / 255.
 X_digits_test = X_digits_test / 255.
 
-scaler = MinMaxScaler()
+scaler = StandardScaler()
 X_news = scaler.fit_transform(X_news)
 X_news_test = scaler.fit_transform(X_news_test)
